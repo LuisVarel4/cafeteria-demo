@@ -28,7 +28,9 @@ jobs:
           cache: npm
 
       - name: Install packages
-        run: npm ci
+        # npm install is more tolerant of optional platform deps
+        # (Rspack WASM / @emnapi) than npm ci across OS lockfiles
+        run: npm install
 
       # public-path=./ keeps assets working on
       # https://<user>.github.io/<repo>/
