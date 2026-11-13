@@ -1,0 +1,42 @@
+name: Deploy Remotion Studio
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Bundle and deploy Studio
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install packages
+        run: npm ci
+
+      # public-path=./ keeps assets working on
+      # https://<user>.github.io/<repo>/
+      - name: Bundle Studio
+        run: npx remotion bundle --public-path=./
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: build
+          branch: gh-pages
